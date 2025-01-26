@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Sep 15 13:10:20 2024
-
-@author: A0067499
-"""
-
 import numpy as np
 import sympy as sp
 
