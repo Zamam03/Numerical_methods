@@ -1,17 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Sep  9 10:43:20 2024
-
-@author: A0067499
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Sep  4 11:07:21 2024
-
-@author: A0067499
-"""
-
 import numpy as np
 import sympy as sp
 
