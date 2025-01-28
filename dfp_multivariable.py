@@ -18,61 +18,47 @@ def dfp_multivariable(f, vars, init_guess, tol=1e-6, max_iter=100):
     x_min: np.array, the point where the minimum occurs
     f_min: float, the minimum value of the function
     """
-    # Compute the gradient (first derivatives)
     grad_f = [sp.diff(f, var) for var in vars]
     
-    # Convert sympy expressions to lambda functions for numerical evaluation
     grad_f_lambdas = [sp.lambdify(vars, grad, "numpy") for grad in grad_f]
     f_lambda = sp.lambdify(vars, f, "numpy")
-    
-    # Initialize the current point and the inverse Hessian approximation (identity matrix)
+
     x_curr = np.array(init_guess)
     n = len(x_curr)
     G = np.eye(n)
 
     for i in range(max_iter):
-        # Evaluate the gradient at the current point
+
         grad_curr = np.array([grad_f_lambda(*x_curr) for grad_f_lambda in grad_f_lambdas], dtype=float)
 
-        # Check for convergence based on gradient norm
         if np.linalg.norm(grad_curr) < tol:
             print(f'Converged in {i+1} iterations')
             break
         
-        # Compute search direction
         d_k = -G @ grad_curr
         
-        # Line search: use secant method to find the optimal alpha
         alpha_func = lambda alpha: f_lambda(*x_curr + alpha * d_k)
         alpha_k = secant_method_stationary_points(alpha_func, 1, 2)
 
-        # Update current point
         x_next = x_curr + alpha_k * d_k
 
-        # Evaluate new gradient
         grad_next = np.array([grad_f_lambda(*x_next) for grad_f_lambda in grad_f_lambdas], dtype=float)
 
-        # Compute updates for DFP
         delta_k = alpha_k * d_k
         gamma_k = grad_next - grad_curr
 
-        # DFP Update formula (using outer products)
         term1 = np.outer(delta_k, delta_k) / np.dot(delta_k, gamma_k)
         term2 = G @ np.outer(gamma_k, gamma_k) @ G / (gamma_k.T @ G @ gamma_k)
         G = G + term1 - term2
 
-        # Update for next iteration
         x_curr = x_next
 
     else:
         print("Maximum iterations reached without convergence")
-    
-    # Calculate the minimum value of the function
+
     f_min = f_lambda(*x_curr)
     
     return x_curr, f_min
-
-
 
 
 def secant_method_stationary_points(f, alpha0, alpha1, tol=1e-6, max_iter=100):
